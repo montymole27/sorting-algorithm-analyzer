@@ -1,4 +1,6 @@
 import { algorithms, type Algorithm, type InsertAlgorithm, results, type Result, type InsertResult, users, type User, type InsertUser } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -18,86 +20,79 @@ export interface IStorage {
   getRecentResults(limit: number): Promise<Result[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private algorithmsMap: Map<number, Algorithm>;
-  private resultsMap: Map<number, Result>;
-  private userCurrentId: number;
-  private algorithmCurrentId: number;
-  private resultCurrentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.algorithmsMap = new Map();
-    this.resultsMap = new Map();
-    this.userCurrentId = 1;
-    this.algorithmCurrentId = 1;
-    this.resultCurrentId = 1;
-    
-    // Initialize with default sorting algorithms
-    this.initializeAlgorithms();
-  }
-
-  // User methods
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userCurrentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
   
-  // Algorithm methods
   async getAlgorithm(id: number): Promise<Algorithm | undefined> {
-    return this.algorithmsMap.get(id);
+    const [algorithm] = await db.select().from(algorithms).where(eq(algorithms.id, id));
+    return algorithm || undefined;
   }
   
   async getAlgorithmByName(name: string): Promise<Algorithm | undefined> {
-    return Array.from(this.algorithmsMap.values()).find(
-      (algorithm) => algorithm.name.toLowerCase() === name.toLowerCase(),
-    );
+    const [algorithm] = await db
+      .select()
+      .from(algorithms)
+      .where(eq(algorithms.name, name));
+    return algorithm || undefined;
   }
   
   async getAllAlgorithms(): Promise<Algorithm[]> {
-    return Array.from(this.algorithmsMap.values());
+    return await db.select().from(algorithms);
   }
   
   async createAlgorithm(insertAlgorithm: InsertAlgorithm): Promise<Algorithm> {
-    const id = this.algorithmCurrentId++;
-    const algorithm: Algorithm = { ...insertAlgorithm, id };
-    this.algorithmsMap.set(id, algorithm);
+    const [algorithm] = await db
+      .insert(algorithms)
+      .values(insertAlgorithm)
+      .returning();
     return algorithm;
   }
   
-  // Result methods
   async saveResult(insertResult: InsertResult): Promise<Result> {
-    const id = this.resultCurrentId++;
-    const result: Result = { ...insertResult, id };
-    this.resultsMap.set(id, result);
+    const [result] = await db
+      .insert(results)
+      .values(insertResult)
+      .returning();
     return result;
   }
   
   async getResultById(id: number): Promise<Result | undefined> {
-    return this.resultsMap.get(id);
+    const [result] = await db.select().from(results).where(eq(results.id, id));
+    return result || undefined;
   }
   
   async getRecentResults(limit: number): Promise<Result[]> {
-    return Array.from(this.resultsMap.values())
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, limit);
+    return await db
+      .select()
+      .from(results)
+      .orderBy(({ asc, desc }) => [desc(results.id)])
+      .limit(limit);
   }
   
-  // Initialize default algorithms
-  private initializeAlgorithms() {
+  async initializeAlgorithms(): Promise<void> {
+    // Check if algorithms already exist
+    const existingAlgorithms = await db.select().from(algorithms);
+    if (existingAlgorithms.length > 0) {
+      console.log("Algorithms already exist in database. Skipping initialization.");
+      return;
+    }
+    
     const defaultAlgorithms: InsertAlgorithm[] = [
       {
         name: "Bubble Sort",
@@ -332,12 +327,13 @@ function heapify(arr, n, i) {
       }
     ];
     
-    // Add algorithms to storage
-    defaultAlgorithms.forEach(algorithm => {
-      const id = this.algorithmCurrentId++;
-      this.algorithmsMap.set(id, { ...algorithm, id });
-    });
+    console.log("Initializing algorithms in database...");
+    for (const algorithm of defaultAlgorithms) {
+      await db.insert(algorithms).values(algorithm);
+    }
+    console.log("Algorithm initialization complete!");
   }
 }
 
-export const storage = new MemStorage();
+// Create and initialize the database storage
+export const storage = new DatabaseStorage();
