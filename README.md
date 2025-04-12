@@ -1,12 +1,37 @@
-# Sorting-Algorithm-Analyzer
+# Sorting Algorithm Analyzer
+An interactive web application for visualizing, comparing, and learning about various sorting algorithms. This project combines animation, algorithm education, and performance metrics in a clean, modern interface.
 
-# Introduction
-The Sorting Algorithm Analyzer was created by me and the Replit AI for the 2025 Bitcamp Hackathon at University of Maryland. I wanted to create a website that talks about different sorting algorithms. On the main home page, users enter in a number of integers separated by commas that they want to input (think of it like a list/array of data). The user can also hit the rotating arrows symbol for the code to automatically input a list of integers for them. There are two dropown menus.
+## Features
+- **Real-time visualizations** of classic sorting algorithms.
+- **Informative descriptions** and time-complexity badges.
+- **Responsive, accessible UI** built in with modern components.
+- **Compare preformance** by algorithm type and data set.
+- **API-driven archetecture** with ReactQuery and TypeScript.
 
-1. <ins>**Custom Data Size**</ins>
-   - **Small:** allows a length of up to 20 integers.
-   - **Medium:** allows a length of up to 100 integers.
-   - **Large:** allows a length of up to 1,000 integers.
-   - **Extra Large:** allows a length of up to 10,000 integers.
-2. <ins>**Initial Data Order**</ins>
-   - 
+## Demo
+Coming soon... unless I'm too lazy. It might also be on the Devpost.
+
+## Tech Stack
+- **Front End:** React, TypeScript, Tailwind CSS, Radix UI
+- **Routing:** Wouter
+- **State/Data:** ReactQuery
+- **Icons/Graphics:** Lucide
+- **Design Utilities:** class-variance-authority, custom UI components.
+
+## Layout
+- **Components:** reusable UI components
+- **Pages:** top-level page views
+- **Lib:** utility functions (class helpers)
+- **Hooks:** custom React hooks
+- **Schema:** shared types/interfaces
+- **API:** backend endpoints or client stubs
+
+## Algorithms
+- Bubble Sort
+- Selection Sort
+- Insertion Sort
+- Merge Sort
+- Quick Sort
+- Heap Sort
+- Shell Sort
+- Counting Sort
