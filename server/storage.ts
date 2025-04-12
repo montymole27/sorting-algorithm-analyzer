@@ -81,7 +81,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(results)
-      .orderBy(({ asc, desc }) => [desc(results.id)])
+      .orderBy(results.id)
       .limit(limit);
   }
   

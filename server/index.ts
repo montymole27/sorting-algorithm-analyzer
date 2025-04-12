@@ -38,6 +38,14 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize database with algorithms
+  try {
+    await (storage as any).initializeAlgorithms();
+    log("Database initialized successfully");
+  } catch (error) {
+    log(`Error initializing database: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
