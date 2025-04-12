@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import Home from "@/pages/home";
 import AlgorithmDetail from "@/pages/algorithm-detail";
+import AlgorithmsPage from "@/pages/algorithms";
 import NotFound from "@/pages/not-found";
 import { Navbar } from "@/components/ui/navbar";
 
@@ -10,6 +11,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/algorithms" component={AlgorithmsPage} />
       <Route path="/algorithm/:id" component={AlgorithmDetail} />
       <Route component={NotFound} />
     </Switch>

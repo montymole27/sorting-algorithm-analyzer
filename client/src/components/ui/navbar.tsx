@@ -10,7 +10,7 @@ export function Navbar() {
 
   const menuItems = [
     { name: "Home", href: "/" },
-    { name: "Algorithms", href: "/#algorithms" }
+    { name: "Algorithms", href: "/algorithms" }
   ];
 
   const isActive = (path: string) => {
