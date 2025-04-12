@@ -25,7 +25,7 @@ export function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center text-primary">
               <ArrowUpDown className="h-6 w-6 mr-2" />
-              <span className="font-bold text-lg">SortAnalyzer</span>
+              <span className="font-bold text-lg">montymole27</span>
             </Link>
             
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
