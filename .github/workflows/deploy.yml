@@ -1,4 +1,4 @@
-name: Deploy Vite site to GitHub Pages
+name: Deploy Vite app to GitHub Pages
 
 on:
   push:
@@ -23,16 +23,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd client
-          npm install
+          npm ci
 
-      - name: Build site
+      - name: Build the app
         run: |
-          cd client
           npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./client/dist
+          publish_dir: ./dist/public  # This is the folder where Vite outputs the static files
