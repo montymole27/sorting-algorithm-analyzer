@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, ArrowRight, Copy, Info } from "lucide-react";
+import { ArrowLeft, ArrowRight, Copy, Download, Info } from "lucide-react";
 import { Algorithm } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { 
@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { CodeImage } from "@/components/ui/code-image";
 
 interface AlgorithmDetailProps {
   algorithm: Algorithm;
@@ -22,6 +23,8 @@ interface AlgorithmDetailProps {
 export function AlgorithmDetail({ algorithm, algorithms }: AlgorithmDetailProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [codeImage, setCodeImage] = useState<string | null>(null);
+  const [showImage, setShowImage] = useState(false);
 
   // Find the previous and next algorithm for navigation
   const currentIndex = algorithms.findIndex(a => a.id === algorithm.id);
@@ -37,13 +40,33 @@ export function AlgorithmDetail({ algorithm, algorithms }: AlgorithmDetailProps)
     });
     setTimeout(() => setCopied(false), 2000);
   };
+  
+  const handleCodeImageGenerated = (imageUrl: string) => {
+    setCodeImage(imageUrl);
+  };
+  
+  const downloadCodeImage = () => {
+    if (!codeImage) return;
+    
+    const link = document.createElement('a');
+    link.href = codeImage;
+    link.download = `${algorithm.name.toLowerCase().replace(/\s+/g, '-')}-code.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Code image downloaded",
+      duration: 2000,
+    });
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between">
         <div>
-          <Link href="/" className="inline-flex items-center text-primary hover:text-primary-dark text-sm font-medium mb-2">
-            <ArrowLeft className="mr-1 h-4 w-4" /> Back to Results
+          <Link href="/algorithms" className="inline-flex items-center text-primary hover:text-primary-dark text-sm font-medium mb-2">
+            <ArrowLeft className="mr-1 h-4 w-4" /> Back to Algorithms
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">{algorithm.name}</h1>
         </div>
@@ -157,7 +180,7 @@ export function AlgorithmDetail({ algorithm, algorithms }: AlgorithmDetailProps)
                 <h4 className="text-lg font-medium text-gray-900 mb-2">
                   When to Use {algorithm.name}
                 </h4>
-                <Alert variant="info" className="bg-blue-50 text-blue-800 border-blue-200">
+                <Alert className="bg-blue-50 text-blue-800 border-blue-200">
                   <Info className="h-4 w-4" />
                   <AlertTitle className="text-blue-800">Usage Guidelines</AlertTitle>
                   <AlertDescription>
@@ -185,21 +208,72 @@ export function AlgorithmDetail({ algorithm, algorithms }: AlgorithmDetailProps)
               <h4 className="text-lg font-medium text-gray-900 mb-2">
                 Implementation
               </h4>
-              <div className="bg-gray-800 rounded-md overflow-hidden shadow-sm">
-                <div className="px-4 py-2 bg-gray-900 text-gray-200 text-sm flex justify-between items-center">
-                  <span>JavaScript Implementation</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-gray-400 hover:text-white"
-                    onClick={copyCode}
-                  >
-                    {copied ? "Copied!" : <Copy className="h-4 w-4" />}
-                  </Button>
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-md font-medium text-gray-700">
+                    JavaScript Implementation
+                  </h4>
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowImage(!showImage)}
+                    >
+                      {showImage ? "Show Code" : "Show as Image"}
+                    </Button>
+                    {codeImage && showImage && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadCodeImage}
+                      >
+                        <Download className="h-4 w-4 mr-1" /> Download
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <pre className="p-4 text-sm text-gray-300 overflow-x-auto" style={{ maxHeight: "400px" }}>
-                  <code>{algorithm.code}</code>
-                </pre>
+                
+                {showImage ? (
+                  <div className="bg-gray-800 rounded-md overflow-hidden shadow-sm">
+                    {codeImage ? (
+                      <div className="overflow-auto" style={{ maxHeight: "500px" }}>
+                        <img 
+                          src={codeImage} 
+                          alt={`${algorithm.name} implementation code`} 
+                          className="w-full"
+                        />
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-gray-400">
+                        Generating code image...
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-gray-800 rounded-md overflow-hidden shadow-sm">
+                    <div className="px-4 py-2 bg-gray-900 text-gray-200 text-sm flex justify-between items-center">
+                      <span>JavaScript Implementation</span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-gray-400 hover:text-white"
+                        onClick={copyCode}
+                      >
+                        {copied ? "Copied!" : <Copy className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                    <pre className="p-4 text-sm text-gray-300 overflow-x-auto" style={{ maxHeight: "400px" }}>
+                      <code>{algorithm.code}</code>
+                    </pre>
+                  </div>
+                )}
+                
+                {/* Hidden component to generate the code image */}
+                <CodeImage 
+                  code={algorithm.code} 
+                  language="JavaScript" 
+                  onImageGenerated={handleCodeImageGenerated} 
+                />
               </div>
 
               <div className="mt-6">

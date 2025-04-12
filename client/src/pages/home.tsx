@@ -27,6 +27,14 @@ export default function Home() {
         <p className="mt-3 max-w-2xl mx-auto text-lg text-gray-500 sm:mt-4">
           Compare the performance of different sorting algorithms on your custom dataset.
         </p>
+        <div className="mt-6">
+          <a 
+            href="/algorithms" 
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            View All Algorithms
+          </a>
+        </div>
       </div>
 
       <InputForm onSortResults={handleSortResults} />
