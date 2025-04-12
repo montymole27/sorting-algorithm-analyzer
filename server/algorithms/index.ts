@@ -4,6 +4,8 @@ import { mergeSort } from "./merge-sort";
 import { insertionSort } from "./insertion-sort";
 import { selectionSort } from "./selection-sort";
 import { heapSort } from "./heap-sort";
+import { shellSort } from "./shell-sort";
+import { countingSort } from "./counting-sort";
 
 export interface SortResult {
   time: number;
@@ -110,5 +112,17 @@ export const algorithms: SortAlgorithm[] = [
     name: "Heap Sort",
     sort: heapSort,
     timeComplexity: "O(n log n)"
+  },
+  {
+    id: 7,
+    name: "Shell Sort",
+    sort: shellSort,
+    timeComplexity: "O(n log² n)"
+  },
+  {
+    id: 8,
+    name: "Counting Sort",
+    sort: countingSort,
+    timeComplexity: "O(n+k)"
   }
 ];

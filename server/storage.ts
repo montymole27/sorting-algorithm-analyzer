@@ -87,9 +87,137 @@ export class DatabaseStorage implements IStorage {
   
   async initializeAlgorithms(): Promise<void> {
     // Check if algorithms already exist
-    const existingAlgorithms = await db.select().from(algorithms);
-    if (existingAlgorithms.length > 0) {
-      console.log("Algorithms already exist in database. Skipping initialization.");
+    let existingAlgorithms = await db.select().from(algorithms);
+    
+    // Check if we need to add new algorithms (like Shell Sort)
+    const algorithmCount = existingAlgorithms.length;
+    
+    if (algorithmCount === 6) {
+      console.log("Adding new Shell Sort algorithm to the database...");
+      await db.insert(algorithms).values({
+        name: "Shell Sort",
+        description: "An extension of insertion sort that allows the comparison and exchange of elements that are far apart. It starts by sorting pairs of elements far apart from each other, then progressively reduces the gap between elements to be compared.",
+        timeComplexityBest: "O(n log n)",
+        timeComplexityAverage: "O(n log² n)",
+        timeComplexityWorst: "O(n²)",
+        spaceComplexity: "O(1)",
+        code: `function shellSort(arr) {
+  const n = arr.length;
+  
+  // Start with a big gap, then reduce the gap
+  for (let gap = Math.floor(n / 2); gap > 0; gap = Math.floor(gap / 2)) {
+    
+    // Do a gapped insertion sort for this gap size
+    for (let i = gap; i < n; i++) {
+      // add a[i] to the elements that have been gap sorted
+      const temp = arr[i];
+      
+      // shift earlier gap-sorted elements up until the correct location for a[i] is found
+      let j;
+      for (j = i; j >= gap && arr[j - gap] > temp; j -= gap) {
+        arr[j] = arr[j - gap];
+      }
+      
+      // put temp (the original a[i]) in its correct location
+      arr[j] = temp;
+    }
+  }
+  
+  return arr;
+}`,
+        useCases: "Medium-sized arrays, when code simplicity is less important than performance",
+        avoidCases: "When algorithm stability is required, when optimal performance isn't critical"
+      });
+      console.log("Successfully added Shell Sort algorithm.");
+      
+      // Check if we need to add Counting Sort as well
+      existingAlgorithms = await db.select().from(algorithms);
+      if (existingAlgorithms.length === 7) {
+        console.log("Adding new Counting Sort algorithm to the database...");
+        await db.insert(algorithms).values({
+          name: "Counting Sort",
+          description: "A non-comparative sorting algorithm that works by counting the number of objects having distinct key values, and applying prefix sum on those counts to determine the positions of each key value in the output sequence.",
+          timeComplexityBest: "O(n+k)",
+          timeComplexityAverage: "O(n+k)",
+          timeComplexityWorst: "O(n+k)",
+          spaceComplexity: "O(n+k)",
+          code: `function countingSort(arr) {
+  // Find the maximum value in the array
+  const max = Math.max(...arr);
+  
+  // Create a counting array of size max+1, initialized with zeros
+  const count = new Array(max + 1).fill(0);
+  
+  // Count the occurrences of each element
+  for (let i = 0; i < arr.length; i++) {
+    count[arr[i]]++;
+  }
+  
+  // Modify count array to store the position of each element
+  for (let i = 1; i <= max; i++) {
+    count[i] += count[i - 1];
+  }
+  
+  // Create output array and place elements in correct positions
+  const output = new Array(arr.length);
+  for (let i = arr.length - 1; i >= 0; i--) {
+    output[count[arr[i]] - 1] = arr[i];
+    count[arr[i]]--;
+  }
+  
+  return output;
+}`,
+          useCases: "Integer sorting, when values have a small range, radix sort subroutine",
+          avoidCases: "When memory is limited, when data has a large range of values, or with floating-point numbers"
+        });
+        console.log("Successfully added Counting Sort algorithm.");
+      }
+      return;
+    } else if (algorithmCount === 7) {
+      console.log("Adding Counting Sort algorithm to the database...");
+      await db.insert(algorithms).values({
+        name: "Counting Sort",
+        description: "A non-comparative sorting algorithm that works by counting the number of objects having distinct key values, and applying prefix sum on those counts to determine the positions of each key value in the output sequence.",
+        timeComplexityBest: "O(n+k)",
+        timeComplexityAverage: "O(n+k)",
+        timeComplexityWorst: "O(n+k)",
+        spaceComplexity: "O(n+k)",
+        code: `function countingSort(arr) {
+  // Find the maximum value in the array
+  const max = Math.max(...arr);
+  
+  // Create a counting array of size max+1, initialized with zeros
+  const count = new Array(max + 1).fill(0);
+  
+  // Count the occurrences of each element
+  for (let i = 0; i < arr.length; i++) {
+    count[arr[i]]++;
+  }
+  
+  // Modify count array to store the position of each element
+  for (let i = 1; i <= max; i++) {
+    count[i] += count[i - 1];
+  }
+  
+  // Create output array and place elements in correct positions
+  const output = new Array(arr.length);
+  for (let i = arr.length - 1; i >= 0; i--) {
+    output[count[arr[i]] - 1] = arr[i];
+    count[arr[i]]--;
+  }
+  
+  return output;
+}`,
+        useCases: "Integer sorting, when values have a small range, radix sort subroutine",
+        avoidCases: "When memory is limited, when data has a large range of values, or with floating-point numbers"
+      });
+      console.log("Successfully added Counting Sort algorithm.");
+      return;
+    } else if (algorithmCount === 8) {
+      console.log("All algorithms already exist in database. Skipping initialization.");
+      return;
+    } else if (algorithmCount > 0) {
+      console.log("Some algorithms exist in database. Skipping initialization.");
       return;
     }
     
@@ -324,6 +452,40 @@ function heapify(arr, n, i) {
 }`,
         useCases: "When guaranteed O(n log n) time is needed, priority queues",
         avoidCases: "When cache performance is critical, when stability is required"
+      },
+      {
+        name: "Shell Sort",
+        description: "An extension of insertion sort that allows the comparison and exchange of elements that are far apart. It starts by sorting pairs of elements far apart from each other, then progressively reduces the gap between elements to be compared.",
+        timeComplexityBest: "O(n log n)",
+        timeComplexityAverage: "O(n log² n)",
+        timeComplexityWorst: "O(n²)",
+        spaceComplexity: "O(1)",
+        code: `function shellSort(arr) {
+  const n = arr.length;
+  
+  // Start with a big gap, then reduce the gap
+  for (let gap = Math.floor(n / 2); gap > 0; gap = Math.floor(gap / 2)) {
+    
+    // Do a gapped insertion sort for this gap size
+    for (let i = gap; i < n; i++) {
+      // add a[i] to the elements that have been gap sorted
+      const temp = arr[i];
+      
+      // shift earlier gap-sorted elements up until the correct location for a[i] is found
+      let j;
+      for (j = i; j >= gap && arr[j - gap] > temp; j -= gap) {
+        arr[j] = arr[j - gap];
+      }
+      
+      // put temp (the original a[i]) in its correct location
+      arr[j] = temp;
+    }
+  }
+  
+  return arr;
+}`,
+        useCases: "Medium-sized arrays, when code simplicity is less important than performance",
+        avoidCases: "When algorithm stability is required, when optimal performance isn't critical"
       }
     ];
     
