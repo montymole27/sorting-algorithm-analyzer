@@ -4,6 +4,13 @@ import themePlugin from "@replit/vite-plugin-shadcn-theme-json";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
+// Optional: polyfill for crypto.getRandomValues if it's not defined
+if (typeof globalThis.crypto === "undefined" || !globalThis.crypto.getRandomValues) {
+  // Dynamically import only if needed
+  const { webcrypto } = await import("node:crypto");
+  globalThis.crypto = webcrypto as Crypto;
+}
+
 export default defineConfig({
   plugins: [
     react(),
